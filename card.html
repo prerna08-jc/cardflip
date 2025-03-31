@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prerna's Portfolio</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f0f0f5; color: #333; text-align: center; }
+        header { background-color: #4CAF50; color: white; padding: 20px; }
+        .project { background: white; margin: 20px auto; padding: 15px; width: 80%; max-width: 500px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        .game-board { display: grid; grid-template-columns: repeat(4, 80px); grid-template-rows: repeat(4, 80px); gap: 10px; justify-content: center; margin: 20px auto; }
+        .card { width: 80px; height: 80px; background-color: #4CAF50; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 36px; color: white; cursor: pointer; }
+        .flipped { background-color: #fff; color: #4CAF50; }
+        footer { margin-top: 20px; padding: 10px; background-color: #eee; color: #777; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Prerna's Portfolio</h1>
+        <p>Explore my creative projects in HTML, CSS, and JavaScript!</p>
+    </header>
+
+    <section id="projects">
+        <h2>Projects</h2>
+        <div class="project">
+            <h3>Memory Flip Card Game</h3>
+            <p>Test your memory by matching all the pairs of cards!</p>
+            <div class="game-board" id="gameBoard"></div>
+            <p id="result"></p>
+            <button onclick="initGame()">Restart Game</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Prerna's Portfolio. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const emojis = ['🍎', '🍌', '🍓', '🍉', '🍍', '🍋', '🥝', '🍇'];
+        let cards = [];
+        let firstCard, secondCard;
+        let lockBoard = false;
+
+        function initGame() {
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+            document.getElementById('result').innerText = '';
+            cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard || this === firstCard) return;
+
+            this.textContent = this.dataset.emoji;
+            this.classList.add('flipped');
+
+            if (!firstCard) {
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            lockBoard = true;
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+                firstCard.removeEventListener('click', flipCard);
+                secondCard.removeEventListener('click', flipCard);
+                resetBoard();
+                if (document.querySelectorAll('.flipped').length === 16) {
+                    document.getElementById('result').innerText = 'You Win!';
+                }
+            } else {
+                setTimeout(() => {
+                    firstCard.textContent = '';
+                    secondCard.textContent = '';
+                    firstCard.classList.remove('flipped');
+                    secondCard.classList.remove('flipped');
+                    resetBoard();
+                }, 1000);
+            }
+        }
+
+        function resetBoard() {
+            [firstCard, secondCard, lockBoard] = [null, null, false];
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
